@@ -181,8 +181,6 @@
         }
         .axis {
             height: 270px;
-            display: flex;
-            align-items: center;
             width: max-content;
             padding: 25px 0;
             animation: stream linear infinite;
@@ -193,16 +191,17 @@
         }
         @keyframes stream {
             from {
-                transform: translateX(0);
+                transform: translate3d(0, 0, 0);
             }
             to {
-                transform: translateX(-50%);
+                transform: translate3d(var(--loop-distance, -1000px), 0, 0);
             }
         }
         .track {
             display: flex;
+            align-items: center;
+            width: max-content;
             gap: 18px;
-            padding-right: 18px;
         }
         .work {
             position: relative;
@@ -635,8 +634,7 @@
         <section class="axis-wrap" aria-label="作品滚动轴">
             <div class="axis-label">WORKS / CONTINUOUS PLAY</div>
             <div class="axis" id="axis">
-                <div class="track" id="track-a"></div>
-                <div class="track" id="track-b" aria-hidden="true"></div>
+                <div class="track" id="track"></div>
             </div>
         </section>
         <section class="bottom">
@@ -687,6 +685,12 @@
         }, 
 		{
             url: 'assets/XFY.png',
+            fallbackImages: [
+                'assets/XFY.PNG',
+                'assets/xfy.png',
+                'assets/有些火我带不回他.png',
+                'assets/有些火，我带不回他.png'
+            ],
             video: 'videos/XFY.mp4',
             type: ' ',
             title: '有些火，我带不回他'
@@ -726,8 +730,7 @@
 
         // ─── DOM 引用 ──────────────────────────────────────────────
         const axis = document.querySelector('#axis');
-        const trackA = document.querySelector('#track-a');
-        const trackB = document.querySelector('#track-b');
+        const track = document.querySelector('#track');
         const counter = document.querySelector('#counter');
         const audio = document.querySelector('#background-music');
         const musicTitle = document.querySelector('#music-title');
@@ -807,7 +810,14 @@
                 poster.className = 'work-poster';
                 poster.src = w.url;
                 poster.alt = w.title || '作品封面';
+                const imageCandidates = [w.url, ...(w.fallbackImages || [])];
+                let imageCandidateIndex = 0;
                 poster.onerror = () => {
+                    imageCandidateIndex += 1;
+                    if (imageCandidateIndex < imageCandidates.length) {
+                        poster.src = imageCandidates[imageCandidateIndex];
+                        return;
+                    }
                     el.classList.add('placeholder');
                     poster.remove();
                     const span = document.createElement('span');
@@ -829,7 +839,7 @@
 
                     const badge = document.createElement('span');
                     badge.className = 'preview-badge';
-                    badge.textContent = 'HOVER / VIDEO';
+                    badge.textContent = '';
 
                     let hovering = false;
                     el.addEventListener('mouseenter', async () => {
@@ -841,7 +851,7 @@
                             if (!hovering) preview.pause();
                         } catch (error) {
                             el.classList.remove('is-previewing');
-                            badge.textContent = 'VIDEO 未加载';
+                            badge.textContent = '';
                         }
                     });
 
@@ -877,36 +887,33 @@
 
         // ─── 渲染滚动轴（确保无限连续） ──────────────────────────
         function render() {
-            trackA.innerHTML = '';
-            trackB.innerHTML = '';
+            track.innerHTML = '';
 
             if (works.length === 0) {
                 const emptyMsg = document.createElement('div');
                 emptyMsg.style.cssText =
                     'color:#7a6a99;font-size:13px;letter-spacing:.1em;padding:20px 40px;';
                 emptyMsg.textContent = '暂无作品';
-                trackA.append(emptyMsg);
-                trackB.append(emptyMsg.cloneNode(true));
+                track.append(emptyMsg);
                 counter.textContent = '00 ARCHIVED WORKS';
                 applySpeed();
                 return;
             }
 
-            const cardWidth = 320 + 18; // 卡片宽度 + gap
-            // 关键：确保每个 track 宽度至少为视口宽度的 2.5 倍，彻底消除空白
-            const trackMinWidth = window.innerWidth * 2.5;
-            const neededCards = Math.ceil(trackMinWidth / cardWidth);
-            // 至少复制 5 次，确保足够冗余
-            const repeatCount = Math.max(5, Math.ceil(neededCards / works.length));
-
-            for (let i = 0; i < repeatCount; i++) {
-                works.forEach(w => {
-                    trackA.append(createCard(w));
-                    trackB.append(createCard(w));
-                });
-            }
+            // 单轨道结构：先渲染完整的 8 个作品，再紧接着复制同样一组用于无缝循环。
+            works.forEach(w => {
+                track.append(createCard(w));
+            });
+            works.forEach(w => {
+                track.append(createCard(w));
+            });
 
             counter.textContent = String(works.length).padStart(2, '0') + ' ARCHIVED WORKS';
+            // 第 9 张卡片与第 1 张卡片之间的距离，正好是一轮完整循环的像素宽度。
+            const firstCard = track.children[0];
+            const repeatedFirstCard = track.children[works.length];
+            const loopDistance = repeatedFirstCard.offsetLeft - firstCard.offsetLeft;
+            axis.style.setProperty('--loop-distance', `-${loopDistance}px`);
             applySpeed();
         }
 
