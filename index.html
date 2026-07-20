@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NEON ARCHIVE · AIGC PORTFOLIO</title>
+    <style>
+        :root {
+            --ink: #05040a;
+            --violet: #a970ff;
+            --pink: #ff4eca;
+            --cyan: #44efff;
+            --line: rgba(157, 112, 255, .38);
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            overflow: hidden;
+            color: #f8f4ff;
+            background: var(--ink);
+            font-family: "Bahnschrift", "Arial Narrow", "Microsoft YaHei", sans-serif;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at 50% 50%, #362054 0, transparent 38%),
+                linear-gradient(90deg, transparent 49.8%, #ac83ff14 50%, transparent 50.2%),
+                linear-gradient(#ac83ff10 1px, transparent 1px);
+            background-size: auto, 52px 52px, 52px 52px;
+        }
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: .16;
+            mix-blend-mode: screen;
+            background: repeating-linear-gradient(0deg, transparent 0 3px, #fff 4px);
+        }
+        .top {
+            height: 105px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 clamp(20px, 5vw, 80px);
+            position: relative;
+            z-index: 2;
+            border-bottom: 1px solid var(--line);
+        }
+        .logo {
+            font-weight: 900;
+            letter-spacing: .12em;
+            font-size: 14px;
+        }
+        .logo b {
+            color: var(--cyan);
+            text-shadow: 0 0 12px var(--cyan);
+        }
+        .top-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .quick-link {
+            color: #e2d8ff;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .12em;
+            text-decoration: none;
+            transition: .2s;
+        }
+        .quick-link:hover {
+            color: var(--cyan);
+            text-shadow: 0 0 12px var(--cyan);
+        }
+        .status {
+            font-size: 10px;
+            letter-spacing: .12em;
+            color: #c6adff;
+        }
+        .status i {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            margin-right: 7px;
+            background: #76ffae;
+            box-shadow: 0 0 12px #76ffae;
+        }
+        main {
+            height: calc(100vh - 105px);
+            min-height: 560px;
+            display: grid;
+            grid-template-rows: 1fr auto 1fr;
+            position: relative;
+            z-index: 1;
+        }
+        .intro {
+            align-self: end;
+            padding: 0 clamp(20px, 5vw, 80px) 36px;
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            gap: 24px;
+        }
+        h1 {
+            margin: 0;
+            font-size: clamp(42px, 7vw, 112px);
+            line-height: .78;
+            letter-spacing: -.08em;
+            font-weight: 900;
+            text-shadow: 0 0 42px #a970ff44;
+        }
+        h1 span {
+            color: var(--cyan);
+            -webkit-text-stroke: 1px #b98cff;
+            text-shadow: 0 0 20px #44efff;
+        }
+        .intro p {
+            margin: 0;
+            max-width: 270px;
+            color: #c8bed9;
+            font-size: 12px;
+            line-height: 1.7;
+            letter-spacing: .08em;
+        }
+        .axis-wrap {
+            position: relative;
+            width: 100%;
+            border-top: 1px solid #b58bff;
+            border-bottom: 1px solid #b58bff;
+            background: #0a0712c7;
+            box-shadow: 0 0 35px #8f5dff32, inset 0 0 35px #8f5dff14;
+            overflow: hidden;
+        }
+        .axis-wrap::before,
+        .axis-wrap::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            z-index: 3;
+            width: clamp(45px, 9vw, 140px);
+            pointer-events: none;
+        }
+        .axis-wrap::before {
+            left: 0;
+            background: linear-gradient(90deg, #08050d, transparent);
+        }
+        .axis-wrap::after {
+            right: 0;
+            background: linear-gradient(-90deg, #08050d, transparent);
+        }
+        .axis-label {
+            position: absolute;
+            left: clamp(15px, 2.5vw, 38px);
+            top: 12px;
+            z-index: 4;
+            color: #f9e9ff;
+            font-size: 10px;
+            letter-spacing: .2em;
+            writing-mode: vertical-rl;
+            text-shadow: 0 0 12px var(--pink);
+        }
+        .axis {
+            height: 270px;
+            display: flex;
+            align-items: center;
+            width: max-content;
+            padding: 25px 0;
+            animation: stream linear infinite;
+            will-change: transform;
+        }
+        .axis-wrap:hover .axis {
+            animation-play-state: paused;
+        }
+        @keyframes stream {
+            from {
+                transform: translateX(0);
+            }
+            to {
+                transform: translateX(-50%);
+            }
+        }
+        .track {
+            display: flex;
+            gap: 18px;
+            padding-right: 18px;
+        }
+        .work {
+            position: relative;
+            flex: 0 0 320px;
+            aspect-ratio: 16 / 9;
+            border: 1px solid #a970ff77;
+            overflow: hidden;
+            background: #191126;
+            cursor: default;
+            box-shadow: inset 0 0 20px #c261ff25, 0 0 18px #a970ff20;
+            transition: .25s;
+        }
+        .work:hover {
+            border-color: var(--cyan);
+            box-shadow: 0 0 28px #44efff77;
+            transform: scale(1.03);
+        }
+        .work img,
+        .work video {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+            filter: saturate(.9) contrast(1.08);
+        }
+        .work::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: linear-gradient(180deg, transparent 45%, #06030ccc);
+        }
+        .caption {
+            position: absolute;
+            z-index: 1;
+            left: 13px;
+            right: 13px;
+            bottom: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: .09em;
+            text-shadow: 0 2px 4px #000;
+        }
+        .caption small {
+            display: block;
+            color: #b8b1c6;
+            margin-bottom: 3px;
+            font-size: 9px;
+            letter-spacing: .15em;
+        }
+        .work.placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at 70% 35%, #3a1a4a 0 2%, transparent 3%),
+                linear-gradient(135deg, #1a0d2a, #4a1a3a 50%, #1a3a4a);
+            color: #a088bb;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-shadow: 0 0 20px #00000088;
+        }
+        .work.placeholder .caption {
+            bottom: 20px;
+            text-align: center;
+        }
+        .bottom {
+            align-self: start;
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            padding: 34px clamp(20px, 5vw, 80px);
+            gap: 25px;
+        }
+        .hint {
+            color: #a9a1bb;
+            font-size: 11px;
+            letter-spacing: .09em;
+        }
+        .hint strong {
+            color: var(--pink);
+        }
+        .counter {
+            font-size: 10px;
+            color: #bda9e9;
+            letter-spacing: .12em;
+            margin-top: 6px;
+        }
+        @media (max-width: 650px) {
+            body {
+                overflow: auto;
+            }
+            .top {
+                height: 70px;
+            }
+            .top-right {
+                gap: 12px;
+            }
+            .quick-link {
+                font-size: 9px;
+            }
+            .status {
+                display: none;
+            }
+            main {
+                height: calc(100svh - 70px);
+                min-height: 600px;
+            }
+            .intro {
+                padding-bottom: 25px;
+                display: block;
+            }
+            .intro p {
+                margin-top: 22px;
+            }
+            .axis {
+                height: 190px;
+            }
+            .work {
+                flex: 0 0 245px;
+            }
+            .bottom {
+                padding-top: 26px;
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 12px;
+            }
+            .axis-label {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="top">
+        <div class="logo">LIU JING <b>/</b> AIGC ARCHIVE</div>
+        <div class="top-right">
+            <a class="quick-link" href="resume.pdf" target="_blank">简历 ↗</a>
+            <a class="quick-link" href="https://icnarvq01wek.feishu.cn/wiki/Aj0MwpQMOi4JsokGJSTcjLZynpe?from=from_copylink" target="_blank" rel="noopener noreferrer">作品集 PPT ↗</a>
+            <div class="status"><i></i>LIVE PORTFOLIO SYSTEM</div>
+        </div>
+    </header>
+    <main>
+        <section class="intro">
+            <h1>柳静<br><span>AIGC作品展示</span></h1>
+            <p>我的 AIGC 创意与未完成的想象。</p>
+        </section>
+        <section class="axis-wrap" aria-label="作品滚动轴">
+            <div class="axis-label">WORKS / CONTINUOUS PLAY</div>
+            <div class="axis" id="axis">
+                <div class="track" id="track-a"></div>
+                <div class="track" id="track-b" aria-hidden="true"></div>
+            </div>
+        </section>
+        <section class="bottom">
+            <div>
+                <div class="hint"><strong>HOVER TO PAUSE</strong>鼠标移动至作品轴暂停浏览</div>
+                <div class="counter" id="counter">— ARCHIVED WORKS</div>
+            </div>
+            <!-- 控制按钮已移除，仅保留显示 -->
+        </section>
+    </main>
+    <script>
+        // ─── 作品数据 ──────────────────────────────────────────────
+        const works = [		
+		{
+            url: 'assets/吃绝户.png',
+            type: ' ',
+            title: '吃绝户？我生给你看！'
+        }, 
+		{
+            url: 'assets/天庭火锅.png',
+            type: ' ',
+            title: '天庭火锅直播事件'
+        }, 
+		{
+            url: 'assets/一诗惊四座.png',
+            type: ' ',
+            title: '一诗惊四座'
+        }, 
+		{
+            url: 'assets/近视.png',
+            type: ' ',
+            title: '近视混进诡异窝'
+        }, 
+		{
+            url: 'assets/龙女.png',
+            type: ' ',
+            title: '龙之女王的复仇'
+        }, 
+		{
+            url: 'assets/TVC泡泡玛特.png',
+            type: ' ',
+            title: 'TVC泡泡玛特'
+        }, 
+		{
+            url: 'assets/TVC霸王茶姬.png',
+            type: ' ',
+            title: 'TVC霸王茶姬'
+        }
+		];
+
+        // ─── DOM 引用 ──────────────────────────────────────────────
+        const axis = document.querySelector('#axis');
+        const trackA = document.querySelector('#track-a');
+        const trackB = document.querySelector('#track-b');
+        const counter = document.querySelector('#counter');
+
+        // ─── 隐藏式速度控制（代码调整） ──────────────────────────
+        const SCROLL_SPEED = 300; // 单位：秒，数值越大滚动越慢
+
+        // ─── 创建作品卡片 ──────────────────────────────────────────
+        function createCard(w) {
+            const el = document.createElement('article');
+            el.className = 'work';
+
+            if (w.url) {
+                const media = document.createElement(w.video ? 'video' : 'img');
+                media.src = w.url;
+                if (w.video) {
+                    media.muted = true;
+                    media.loop = true;
+                    media.playsInline = true;
+                    el.addEventListener('mouseenter', () => media.play().catch(() => {}));
+                    el.addEventListener('mouseleave', () => { media.pause();
+                        media.currentTime = 0; });
+                } else {
+                    media.onerror = () => {
+                        el.classList.add('placeholder');
+                        media.remove();
+                        const span = document.createElement('span');
+                        span.textContent = '◈ 未加载';
+                        span.style.cssText =
+                            'font-size:14px;font-weight:700;color:#a088bb;letter-spacing:.1em;text-shadow:0 0 20px #000;';
+                        el.prepend(span);
+                    };
+                }
+                el.append(media);
+            } else {
+                el.classList.add('placeholder');
+                const span = document.createElement('span');
+                span.textContent = '◈ 占位';
+                span.style.cssText =
+                    'font-size:14px;font-weight:700;color:#a088bb;letter-spacing:.1em;text-shadow:0 0 20px #000;';
+                el.prepend(span);
+            }
+
+            const c = document.createElement('div');
+            c.className = 'caption';
+            c.innerHTML = `<small>${w.type || 'WORK'}</small>${w.title || '未命名'}`;
+            el.append(c);
+            return el;
+        }
+
+        // ─── 渲染滚动轴（确保无限连续） ──────────────────────────
+        function render() {
+            trackA.innerHTML = '';
+            trackB.innerHTML = '';
+
+            if (works.length === 0) {
+                const emptyMsg = document.createElement('div');
+                emptyMsg.style.cssText =
+                    'color:#7a6a99;font-size:13px;letter-spacing:.1em;padding:20px 40px;';
+                emptyMsg.textContent = '暂无作品';
+                trackA.append(emptyMsg);
+                trackB.append(emptyMsg.cloneNode(true));
+                counter.textContent = '00 ARCHIVED WORKS';
+                applySpeed();
+                return;
+            }
+
+            const cardWidth = 320 + 18; // 卡片宽度 + gap
+            // 关键：确保每个 track 宽度至少为视口宽度的 2.5 倍，彻底消除空白
+            const trackMinWidth = window.innerWidth * 2.5;
+            const neededCards = Math.ceil(trackMinWidth / cardWidth);
+            // 至少复制 5 次，确保足够冗余
+            const repeatCount = Math.max(5, Math.ceil(neededCards / works.length));
+
+            for (let i = 0; i < repeatCount; i++) {
+                works.forEach(w => {
+                    trackA.append(createCard(w));
+                    trackB.append(createCard(w));
+                });
+            }
+
+            counter.textContent = String(works.length).padStart(2, '0') + ' ARCHIVED WORKS';
+            applySpeed();
+        }
+
+        // ─── 应用动画速度 ──────────────────────────────────────────
+        function applySpeed() {
+            axis.style.animationDuration = SCROLL_SPEED + 's';
+        }
+
+        // ─── 窗口自适应（防抖） ──────────────────────────────────
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(render, 300);
+        });
+
+        // ─── 键盘快捷键 R 键重新渲染 ────────────────────────────
+        document.addEventListener('keydown', (e) => {
+            if ((e.key === 'r' || e.key === 'R') && !e.ctrlKey && !e.metaKey) {
+                e.preventDefault();
+                render();
+            }
+        });
+
+        // ─── 启动 ──────────────────────────────────────────────────
+        render();
+
+        // 控制台提示
+        console.log('✦ NEON ARCHIVE 已启动 · 按 R 键重新渲染');
+        console.log(`✦ 滚动速度: ${SCROLL_SPEED}s (修改 SCROLL_SPEED 变量调整)`);
+        console.log('✦ 滚动轴已优化为无限连续滚动，不会出现空白');
+    </script>
+</body>
+</html>
