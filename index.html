@@ -228,16 +228,59 @@
             object-fit: cover;
             filter: saturate(.9) contrast(1.08);
         }
+        .work .work-poster,
+        .work .preview-video {
+            position: absolute;
+            inset: 0;
+            transition: opacity .32s ease, transform .55s ease;
+        }
+        .work .work-poster {
+            z-index: 0;
+            opacity: 1;
+        }
+        .work .preview-video {
+            z-index: 1;
+            opacity: 0;
+            background: #05040a;
+        }
+        .work.is-previewing .work-poster {
+            opacity: 0;
+            transform: scale(1.04);
+        }
+        .work.is-previewing .preview-video {
+            opacity: 1;
+        }
+        .preview-badge {
+            position: absolute;
+            z-index: 4;
+            top: 10px;
+            right: 10px;
+            padding: 5px 7px;
+            border: 1px solid rgba(68, 239, 255, .55);
+            color: var(--cyan);
+            background: rgba(5, 4, 10, .72);
+            font-size: 7px;
+            font-weight: 800;
+            letter-spacing: .14em;
+            pointer-events: none;
+            transition: .2s;
+        }
+        .work.is-previewing .preview-badge {
+            color: #05040a;
+            background: var(--cyan);
+            box-shadow: 0 0 14px rgba(68, 239, 255, .45);
+        }
         .work::after {
             content: "";
             position: absolute;
             inset: 0;
+            z-index: 2;
             pointer-events: none;
             background: linear-gradient(180deg, transparent 45%, #06030ccc);
         }
         .caption {
             position: absolute;
-            z-index: 1;
+            z-index: 3;
             left: 13px;
             right: 13px;
             bottom: 12px;
@@ -598,7 +641,7 @@
         </section>
         <section class="bottom">
             <div>
-                <div class="hint"><strong>HOVER TO PAUSE</strong>鼠标移动至作品轴暂停浏览</div>
+                <div class="hint"><strong>HOVER TO PREVIEW</strong>鼠标悬停作品播放视频预览</div>
                 <div class="counter" id="counter">— ARCHIVED WORKS</div>
             </div>
             <!-- 控制按钮已移除，仅保留显示 -->
@@ -626,36 +669,49 @@
         const works = [		
 		{
             url: 'assets/CJH.png',
+            video: 'videos/CJH.mp4',
             type: ' ',
             title: '吃绝户？我生给你看！'
         }, 
 		{
             url: 'assets/TTHG.png',
+            video: 'videos/TTHG.mp4',
             type: ' ',
             title: '天庭火锅直播事件'
         }, 
 		{
             url: 'assets/YSJSZ.png',
+            video: 'videos/YSJSZ.mp4',
             type: ' ',
             title: '一诗惊四座'
         }, 
 		{
+            url: 'assets/XFY.png',
+            video: 'videos/XFY.mp4',
+            type: ' ',
+            title: '有些火，我带不回他'
+        }, 
+		{
             url: 'assets/JS.png',
+            video: 'videos/JS.mp4',
             type: ' ',
             title: '近视混进诡异窝'
         }, 
 		{
             url: 'assets/LV.png',
+            video: 'videos/LV.mp4',
             type: ' ',
             title: '龙之女王的复仇'
         }, 
 		{
             url: 'assets/TVCPPMT.png',
+            video: 'videos/TVCPPMT.mp4',
             type: ' ',
             title: 'TVC泡泡玛特'
         }, 
 		{
             url: 'assets/TVCBWCJ.png',
+            video: 'videos/TVCBWCJ.mp4',
             type: ' ',
             title: 'TVC霸王茶姬'
         }
@@ -747,27 +803,62 @@
             el.className = 'work';
 
             if (w.url) {
-                const media = document.createElement(w.video ? 'video' : 'img');
-                media.src = w.url;
+                const poster = document.createElement('img');
+                poster.className = 'work-poster';
+                poster.src = w.url;
+                poster.alt = w.title || '作品封面';
+                poster.onerror = () => {
+                    el.classList.add('placeholder');
+                    poster.remove();
+                    const span = document.createElement('span');
+                    span.textContent = '◈ 图片未加载';
+                    span.style.cssText =
+                        'font-size:14px;font-weight:700;color:#a088bb;letter-spacing:.1em;text-shadow:0 0 20px #000;';
+                    el.prepend(span);
+                };
+                el.append(poster);
+
                 if (w.video) {
-                    media.muted = true;
-                    media.loop = true;
-                    media.playsInline = true;
-                    el.addEventListener('mouseenter', () => media.play().catch(() => {}));
-                    el.addEventListener('mouseleave', () => { media.pause();
-                        media.currentTime = 0; });
-                } else {
-                    media.onerror = () => {
-                        el.classList.add('placeholder');
-                        media.remove();
-                        const span = document.createElement('span');
-                        span.textContent = '◈ 未加载';
-                        span.style.cssText =
-                            'font-size:14px;font-weight:700;color:#a088bb;letter-spacing:.1em;text-shadow:0 0 20px #000;';
-                        el.prepend(span);
-                    };
+                    const preview = document.createElement('video');
+                    preview.className = 'preview-video';
+                    preview.dataset.src = w.video;
+                    preview.muted = true;
+                    preview.loop = true;
+                    preview.playsInline = true;
+                    preview.preload = 'none';
+
+                    const badge = document.createElement('span');
+                    badge.className = 'preview-badge';
+                    badge.textContent = 'HOVER / VIDEO';
+
+                    let hovering = false;
+                    el.addEventListener('mouseenter', async () => {
+                        hovering = true;
+                        el.classList.add('is-previewing');
+                        if (!preview.src) preview.src = preview.dataset.src;
+                        try {
+                            await preview.play();
+                            if (!hovering) preview.pause();
+                        } catch (error) {
+                            el.classList.remove('is-previewing');
+                            badge.textContent = 'VIDEO 未加载';
+                        }
+                    });
+
+                    el.addEventListener('mouseleave', () => {
+                        hovering = false;
+                        el.classList.remove('is-previewing');
+                        preview.pause();
+                        preview.currentTime = 0;
+                    });
+
+                    preview.addEventListener('error', () => {
+                        el.classList.remove('is-previewing');
+                        badge.textContent = 'VIDEO 未加载';
+                    });
+
+                    el.append(preview, badge);
                 }
-                el.append(media);
             } else {
                 el.classList.add('placeholder');
                 const span = document.createElement('span');
