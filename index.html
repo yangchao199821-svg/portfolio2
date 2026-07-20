@@ -68,17 +68,28 @@
             gap: 20px;
         }
         .quick-link {
-            color: #e2d8ff;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: .12em;
-            text-decoration: none;
-            transition: .2s;
-        }
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 10px 16px;
+		border: 1px solid rgba(169, 112, 255, 0.65);
+		color: #e2d8ff;
+		background: rgba(169, 112, 255, 0.08);
+		font-size: 14px;
+		font-weight: 700;
+		letter-spacing: .08em;
+		text-decoration: none;
+		white-space: nowrap;
+		transition: .2s;
+		}
         .quick-link:hover {
-            color: var(--cyan);
-            text-shadow: 0 0 12px var(--cyan);
-        }
+		color: var(--cyan);
+		border-color: var(--cyan);
+		background: rgba(68, 239, 255, 0.1);
+		box-shadow: 0 0 16px rgba(68, 239, 255, 0.35);
+		text-shadow: 0 0 12px var(--cyan);
+		transform: translateY(-1px);
+		}
         .status {
             font-size: 10px;
             letter-spacing: .12em;
@@ -280,6 +291,224 @@
             letter-spacing: .12em;
             margin-top: 6px;
         }
+        .music-player {
+            position: fixed;
+            right: clamp(16px, 3vw, 42px);
+            bottom: clamp(16px, 3vw, 34px);
+            z-index: 20;
+            width: min(360px, calc(100vw - 32px));
+            padding: 12px 14px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 10px 14px;
+            border: 1px solid #a970ff88;
+            background: rgba(8, 5, 15, .88);
+            box-shadow: 0 0 28px #a970ff35, inset 0 0 22px #44efff0d;
+            backdrop-filter: blur(14px);
+        }
+        .music-info { min-width: 0; }
+        .music-kicker {
+            color: var(--pink);
+            font-size: 8px;
+            font-weight: 800;
+            letter-spacing: .18em;
+        }
+        .music-title {
+            margin-top: 4px;
+            overflow: hidden;
+            color: #f7f2ff;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .music-controls {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .music-button {
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            display: grid;
+            place-items: center;
+            border: 1px solid #a970ff77;
+            color: #efe7ff;
+            background: #171022;
+            cursor: pointer;
+            transition: .2s;
+        }
+        .music-button:hover,
+        .music-button:focus-visible {
+            border-color: var(--cyan);
+            color: var(--cyan);
+            box-shadow: 0 0 14px #44efff55;
+            outline: none;
+        }
+        .music-button.play {
+            border-color: #44efffaa;
+            color: var(--cyan);
+        }
+        .volume-wrap {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 9px;
+            color: #a99cbd;
+            font-size: 9px;
+            letter-spacing: .08em;
+        }
+        .volume-slider {
+            width: 100%;
+            height: 3px;
+            accent-color: var(--cyan);
+            cursor: pointer;
+        }
+        .entry-cover {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 50% 46%, rgba(95, 43, 140, .62), transparent 35%),
+                linear-gradient(135deg, #040309 0%, #0b0713 52%, #050710 100%);
+            transition: opacity .7s ease, visibility .7s ease;
+        }
+        .entry-cover::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(90deg, transparent 49.8%, rgba(68, 239, 255, .08) 50%, transparent 50.2%),
+                linear-gradient(rgba(169, 112, 255, .08) 1px, transparent 1px);
+            background-size: 52px 52px;
+            mask-image: radial-gradient(circle at center, #000 10%, transparent 72%);
+            animation: cover-grid 8s linear infinite;
+        }
+        .entry-cover::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: .12;
+            background: repeating-linear-gradient(0deg, transparent 0 3px, #fff 4px);
+        }
+        .entry-cover.is-leaving {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .entry-frame {
+            position: relative;
+            z-index: 1;
+            width: min(760px, calc(100vw - 40px));
+            padding: clamp(34px, 6vw, 72px);
+            border: 1px solid rgba(169, 112, 255, .62);
+            background: rgba(7, 4, 13, .6);
+            box-shadow: 0 0 60px rgba(169, 112, 255, .22), inset 0 0 45px rgba(68, 239, 255, .05);
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        .entry-frame::before,
+        .entry-frame::after {
+            content: "";
+            position: absolute;
+            width: 54px;
+            height: 54px;
+            pointer-events: none;
+        }
+        .entry-frame::before {
+            top: -1px;
+            left: -1px;
+            border-top: 2px solid var(--cyan);
+            border-left: 2px solid var(--cyan);
+            box-shadow: -5px -5px 18px rgba(68, 239, 255, .2);
+        }
+        .entry-frame::after {
+            right: -1px;
+            bottom: -1px;
+            border-right: 2px solid var(--pink);
+            border-bottom: 2px solid var(--pink);
+            box-shadow: 5px 5px 18px rgba(255, 78, 202, .2);
+        }
+        .entry-code {
+            color: #bda9e9;
+            font-size: 10px;
+            letter-spacing: .24em;
+        }
+        .entry-title {
+            margin: 20px 0 8px;
+            font-size: clamp(46px, 9vw, 104px);
+            line-height: .86;
+            letter-spacing: -.07em;
+            font-weight: 900;
+            text-shadow: 0 0 38px rgba(169, 112, 255, .42);
+        }
+        .entry-title span {
+            display: block;
+            margin-top: 16px;
+            color: var(--cyan);
+            font-size: .48em;
+            letter-spacing: -.03em;
+            -webkit-text-stroke: 1px #b98cff;
+            text-shadow: 0 0 20px var(--cyan);
+        }
+        .entry-subtitle {
+            margin: 24px auto 30px;
+            color: #bdb2cd;
+            font-size: 11px;
+            letter-spacing: .16em;
+        }
+        .entry-button {
+            min-width: 220px;
+            padding: 14px 22px;
+            border: 1px solid var(--cyan);
+            color: var(--cyan);
+            background: rgba(68, 239, 255, .06);
+            font: inherit;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: .16em;
+            cursor: pointer;
+            box-shadow: 0 0 22px rgba(68, 239, 255, .18);
+            transition: .25s;
+        }
+        .entry-button:hover,
+        .entry-button:focus-visible {
+            color: #05040a;
+            background: var(--cyan);
+            box-shadow: 0 0 32px rgba(68, 239, 255, .55);
+            outline: none;
+            transform: translateY(-2px);
+        }
+        .entry-status {
+            margin-top: 20px;
+            color: #776c88;
+            font-size: 8px;
+            letter-spacing: .2em;
+        }
+        .entry-status i {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            margin-right: 7px;
+            border-radius: 50%;
+            background: #76ffae;
+            box-shadow: 0 0 10px #76ffae;
+            animation: status-pulse 1.6s ease-in-out infinite;
+        }
+        @keyframes cover-grid {
+            to { background-position: 52px 0, 0 52px; }
+        }
+        @keyframes status-pulse {
+            50% { opacity: .35; }
+        }
         @media (max-width: 650px) {
             body {
                 overflow: auto;
@@ -322,10 +551,31 @@
             .axis-label {
                 display: none;
             }
+            .music-player {
+                right: 12px;
+                bottom: 12px;
+                width: calc(100vw - 24px);
+            }
+            .entry-frame {
+                padding: 44px 22px;
+            }
+            .entry-button {
+                width: 100%;
+                min-width: 0;
+            }
         }
     </style>
 </head>
 <body>
+    <section class="entry-cover" id="entry-cover" aria-label="进入作品集">
+        <div class="entry-frame">
+            <div class="entry-code">LIU JING / DIGITAL VISUAL ARCHIVE</div>
+            <div class="entry-title">柳静<span>AIGC 作品集</span></div>
+            <div class="entry-subtitle">创意 · 视觉 · 叙事 · 未完成的想象</div>
+            <button class="entry-button" id="enter-portfolio" type="button">进入作品集 &nbsp;↗</button>
+            <div class="entry-status"><i></i>SYSTEM READY · SOUND ON</div>
+        </div>
+    </section>
     <header class="top">
         <div class="logo">LIU JING <b>/</b> AIGC ARCHIVE</div>
         <div class="top-right">
@@ -354,6 +604,23 @@
             <!-- 控制按钮已移除，仅保留显示 -->
         </section>
     </main>
+    <aside class="music-player" aria-label="背景音乐播放器">
+        <div class="music-info">
+            <div class="music-kicker">NOW PLAYING</div>
+            <div class="music-title" id="music-title">等待播放</div>
+        </div>
+        <div class="music-controls">
+            <button class="music-button" id="previous-track" type="button" aria-label="上一首">&#9198;</button>
+            <button class="music-button play" id="toggle-music" type="button" aria-label="播放">&#9654;</button>
+            <button class="music-button" id="next-track" type="button" aria-label="下一首">&#9197;</button>
+        </div>
+        <div class="volume-wrap">
+            <span>VOL</span>
+            <input class="volume-slider" id="music-volume" type="range" min="0" max="1" step="0.01" value="0.5" aria-label="音量">
+            <span id="volume-value">50%</span>
+        </div>
+        <audio id="background-music" preload="auto"></audio>
+    </aside>
     <script>
         // ─── 作品数据 ──────────────────────────────────────────────
         const works = [		
@@ -394,11 +661,82 @@
         }
 		];
 
+        // ─── 背景音乐歌单 ─────────────────────────────────────────
+        // 将 MP3 上传到仓库的 music 文件夹，并在这里修改文件名和显示名称。
+        const playlist = [
+            { title: '黄昏替他们说', src: 'music/黄昏替他们说.mp3' },
+            { title: '携以晚风', src: 'music/携以晚风.mp3' }
+        ];
+
         // ─── DOM 引用 ──────────────────────────────────────────────
         const axis = document.querySelector('#axis');
         const trackA = document.querySelector('#track-a');
         const trackB = document.querySelector('#track-b');
         const counter = document.querySelector('#counter');
+        const audio = document.querySelector('#background-music');
+        const musicTitle = document.querySelector('#music-title');
+        const toggleMusic = document.querySelector('#toggle-music');
+        const previousTrack = document.querySelector('#previous-track');
+        const nextTrack = document.querySelector('#next-track');
+        const musicVolume = document.querySelector('#music-volume');
+        const volumeValue = document.querySelector('#volume-value');
+        const entryCover = document.querySelector('#entry-cover');
+        const enterPortfolio = document.querySelector('#enter-portfolio');
+
+        let currentTrack = 0;
+
+        function loadTrack(index, shouldPlay = false) {
+            currentTrack = (index + playlist.length) % playlist.length;
+            const track = playlist[currentTrack];
+            audio.src = track.src;
+            musicTitle.textContent = `${String(currentTrack + 1).padStart(2, '0')} / ${track.title}`;
+            if (shouldPlay) playMusic();
+        }
+
+        async function playMusic() {
+            try {
+                await audio.play();
+                toggleMusic.innerHTML = '&#10074;&#10074;';
+                toggleMusic.setAttribute('aria-label', '暂停');
+            } catch (error) {
+                musicTitle.textContent = '音乐文件未找到，请检查 music 文件夹';
+            }
+        }
+
+        function pauseMusic() {
+            audio.pause();
+            toggleMusic.innerHTML = '&#9654;';
+            toggleMusic.setAttribute('aria-label', '播放');
+        }
+
+        toggleMusic.addEventListener('click', () => {
+            if (audio.paused) playMusic();
+            else pauseMusic();
+        });
+
+        previousTrack.addEventListener('click', () => loadTrack(currentTrack - 1, true));
+        nextTrack.addEventListener('click', () => loadTrack(currentTrack + 1, true));
+        audio.addEventListener('ended', () => loadTrack(currentTrack + 1, true));
+        audio.addEventListener('error', () => {
+            musicTitle.textContent = '音乐文件未找到，请检查 music 文件夹';
+            pauseMusic();
+        });
+
+        musicVolume.addEventListener('input', () => {
+            audio.volume = Number(musicVolume.value);
+            volumeValue.textContent = `${Math.round(audio.volume * 100)}%`;
+        });
+
+        enterPortfolio.addEventListener('click', async () => {
+            enterPortfolio.disabled = true;
+            enterPortfolio.textContent = '正在进入…';
+            await playMusic();
+            entryCover.classList.add('is-leaving');
+            window.setTimeout(() => entryCover.remove(), 750);
+        });
+
+        audio.volume = Number(musicVolume.value);
+        loadTrack(0);
 
         // ─── 隐藏式速度控制（代码调整） ──────────────────────────
         const SCROLL_SPEED = 300; // 单位：秒，数值越大滚动越慢
